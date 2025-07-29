@@ -1,11 +1,10 @@
 import pytest
 from selenium import webdriver
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 
 from curl import authorization_page, main_page
 from data import DATA_LOGIN
 from locators.login_page_locators import LoginPageLocators
+from pages.base_page import BasePage
 
 
 @pytest.fixture(params=["chrome", "firefox"])
@@ -22,9 +21,10 @@ def driver(request):
 
 @pytest.fixture
 def authorization(driver):
+    base_page = BasePage(driver)
     driver.get(authorization_page)
-    WebDriverWait(driver, 10).until(EC.visibility_of_element_located(LoginPageLocators.EMAIL))
-    driver.find_element(*LoginPageLocators.EMAIL).send_keys(DATA_LOGIN[0])
-    driver.find_element(*LoginPageLocators.PASSWORD).send_keys(DATA_LOGIN[1])
-    driver.find_element(*LoginPageLocators.LOGIN).click()
+    base_page.wait_for_element(LoginPageLocators.EMAIL)
+    base_page.send_keys_to_element(LoginPageLocators.EMAIL, DATA_LOGIN[0])
+    base_page.send_keys_to_element(LoginPageLocators.PASSWORD, DATA_LOGIN[1])
+    base_page.click_on_element(LoginPageLocators.LOGIN)
     return driver
